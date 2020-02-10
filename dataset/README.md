@@ -1,7 +1,7 @@
-## final_dataset
+# final_dataset
 - naver movie rating + single turn + multi turn
 
-# train
+## train
 - total data #: 33110
 - neutral #: 6622
 - happy #: 6622
@@ -9,7 +9,7 @@
 - anger #: 6622
 - suprised #: 6622
 
-# test
+## test
 - total data #: 3500
 - neutral #: 700
 - happy #: 700
@@ -17,7 +17,7 @@
 - anger #: 700
 - suprised #: 700
 
-# with_paraphrase
+## with_paraphrase
 - append back-translated sentence to train dataset
 - total data #: 66211
 - neutral #: 13243
@@ -26,17 +26,17 @@
 - anger #: 13241
 - surprised #: 13241
 
-## dataset without neutral
+# dataset without neutral
 - datasets without neutral. numbers for label NOT same
 
-# train
+## train
 - total data #: 70374
 - happy #: 14197
 - sad #: 13944
 - anger #: 24821
 - surprised #: 17412
 
-# test
+## test
 - total data #: 2800
 - happy #: 700
 - sad #: 700
