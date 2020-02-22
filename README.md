@@ -1,7 +1,8 @@
-# BERT SA model
+# BERT + adapter for Korean SA finetuning
 multi labeled korean sentiment analysis
 - 5 labels: neutral, happy, sad, angry, surprised
 - multilingual BERT model
+- Google adapter for better transfer learning
 
 
 ## checkpoint URL
