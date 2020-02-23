@@ -26,6 +26,15 @@ slight changes were made to run this specific task
 - original adapter-Bert : https://github.com/google-research/adapter-bert
 - adapter-Bert for this task: https://github.com/junhahyung/adapter-bert
 
+## BOG_final.ipynb
+classify labels by Bag_Of_Words and linear SVM
+- "report_results(grid_svm.best_estimator_, X_test, y_test" cell will return 
+    1. accuracy
+    2. F1 score
+    3. precision
+    4. recall
+- takes about 2hrs for 20000 sentences
+
 ## result
 
 
