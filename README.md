@@ -8,6 +8,7 @@ multi labeled korean sentiment analysis
 ## checkpoint URL
 https://drive.google.com/file/d/1UkYxxvygFfuj3pjhHcm3glwdp3rPn49V/view?usp=sharing
 
+
 ## How to run
 1. Upload train/Bert_adapter.ipynb on colab
 2. In google cloud platform, create a storage named 'mbertfinetune'
@@ -21,11 +22,30 @@ https://drive.google.com/file/d/1UkYxxvygFfuj3pjhHcm3glwdp3rPn49V/view?usp=shari
 
 - output will be saved to your storage (gs://mbertfinetune/bert-adapter-tfhub/models/korean_sa_4 or korean_sa)
 
-## adapter-Bert model
+
+## Adapter-Bert model
 slight changes were made to run this specific task
 - original adapter-Bert : https://github.com/google-research/adapter-bert
 - adapter-Bert for this task: https://github.com/junhahyung/adapter-bert
 
-## result
+
+## BOG_final.ipynb
+classify labels by Bag_Of_Words and linear SVM
+- "report_results(grid_svm.best_estimator_, X_test, y_test" cell will return 
+    1. accuracy
+    2. F1 score
+    3. precision
+    4. recall
+- takes about 2hrs for 20000 sentences
+
+
+## Result
+### BOG_final.ipynb
+- score with "without_neutral_train/test"
+1. Accuracy : 0.705
+2. F1 score : [0.73447205, 0.70321637, 0.69081154, 0.69511356]
+3. Precision :  [0.80442177, 0.72005988, 0.65107459, 0.67065073]
+4. Recall : [0.67571429, 0.68714286, 0.73571429, 0.72142857]
+### Adapter-Bert
 
 
