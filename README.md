@@ -48,4 +48,6 @@ classify labels by Bag_Of_Words and linear SVM
 4. Recall : [0.67571429, 0.68714286, 0.73571429, 0.72142857]
 ### Adapter-Bert
 
-
+TODO
+api에 ksa_4 추가하기
+adapter없는 애랑도 비교해서 돌려보기
