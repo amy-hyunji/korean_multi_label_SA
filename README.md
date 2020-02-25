@@ -1,11 +1,13 @@
-# BERT SA model
+# BERT + adapter for Korean SA finetuning
 multi labeled korean sentiment analysis
 - 5 labels: neutral, happy, sad, angry, surprised
 - multilingual BERT model
+- Google adapter for better transfer learning
 
 
 ## checkpoint URL
 https://drive.google.com/file/d/1UkYxxvygFfuj3pjhHcm3glwdp3rPn49V/view?usp=sharing
+
 
 ## How to run
 1. Upload train/Bert_adapter.ipynb on colab
@@ -13,10 +15,37 @@ https://drive.google.com/file/d/1UkYxxvygFfuj3pjhHcm3glwdp3rPn49V/view?usp=shari
 3. Create a subdirectory data/korean_sa
 4. Upload dataset on the subdirectory
 
-- on 3rd cell, set TASK = 'korean_sa' to classify 5 emotions, set TASK = 'korean_sa_4' to classify 4 emotions(without neutral)
+- on 3rd cell, to classify 5 emotions: <pre><code>TASK = 'korean_sa'</code></pre>, to classify 4 emotions(without neutral) : <pre><code>TASK = 'korean_sa_4'</code></pre>
 - on 4th cell, adjust hyperparameters such as lr and epochs
 - on 4th cell, layer_wise_lr applies different learning rates on different layers
     (ex) layer_wise_lr = (True, 0.3) => init_lr on top layer, init_lr * 0.3 on second to top layer ..
 
 - output will be saved to your storage (gs://mbertfinetune/bert-adapter-tfhub/models/korean_sa_4 or korean_sa)
+
+
+## Adapter-Bert model
+slight changes were made to run this specific task
+- original adapter-Bert : https://github.com/google-research/adapter-bert
+- adapter-Bert for this task: https://github.com/junhahyung/adapter-bert
+
+
+## BOG_final.ipynb
+classify labels by Bag_Of_Words and linear SVM
+- "report_results(grid_svm.best_estimator_, X_test, y_test" cell will return 
+    1. accuracy
+    2. F1 score
+    3. precision
+    4. recall
+- takes about 2hrs for 20000 sentences
+
+
+## Result
+### BOG_final.ipynb
+- score with "without_neutral_train/test"
+1. Accuracy : 0.705
+2. F1 score : [0.73447205, 0.70321637, 0.69081154, 0.69511356]
+3. Precision :  [0.80442177, 0.72005988, 0.65107459, 0.67065073]
+4. Recall : [0.67571429, 0.68714286, 0.73571429, 0.72142857]
+### Adapter-Bert
+
 
