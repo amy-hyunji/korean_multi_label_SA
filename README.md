@@ -47,7 +47,8 @@ classify labels by Bag_Of_Words and linear SVM
 3. Precision :  [0.80442177, 0.72005988, 0.65107459, 0.67065073]
 4. Recall : [0.67571429, 0.68714286, 0.73571429, 0.72142857]
 ### Adapter-Bert
-1. VERSION1 with 5 emotions - EPOCH 3
+1. VERSION1 with 5 emotions \
+- EPOCH 3\
 **F1 score**\
 neutral_f1: 0.60294\
 anger_f1: 0.76289\
@@ -61,7 +62,8 @@ sad         [90 28 479 60 43]\
 angry       [45 39 69 460 84]\
 surprise    [78 46 63 94 419]\
 
-2. VERSION2 with 4 emotions (without NEUTRAL) - EPOCH 100
+2. VERSION2 with 4 emotions (without NEUTRAL)\
+- EPOCH 100\
 **F1 score**\
 anger_f1: 0.9957020192282109\
 happy_f1: 0.9949892770012569\
