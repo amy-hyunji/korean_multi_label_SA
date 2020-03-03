@@ -333,7 +333,11 @@ class KsaProcessor(DataProcessor):
         if _type == 'cleansed':
             train_dir = os.path.join(data_dir, "final_single_plus_naver_train.csv")
         elif _type == 'noncleansed':
-            train_dir = data_dir
+            train_dir = os.path.join(data_dir, "noncleansing_final_single_plus_naver_train_original.csv")
+        elif _type == 'multi_added':
+            train_dir = os.path.join(data_dir, "final_single_plus_multi_plus_naver_train.csv")
+        elif _type == 'final':
+            train_dir = os.path.join(data_dir, "final_with_paraphrase.csv")
 
         with tf.gfile.Open(train_dir, "r") as f:
             reader = csv.reader(f, dialect='excel')
@@ -359,6 +363,8 @@ class KsaProcessor(DataProcessor):
             dev_dir = os.path.join(data_dir, "final_single_plus_naver_test.csv")
         elif _type == 'noncleansed':
             dev_dir = os.path.join(data_dir, "noncleansing_final_single_plus_naver_test_original.csv")
+        elif _type == 'multi_added':
+            dev_dir = os.path.join(data_dir, "final_single_plus_multi_plus_naver_test.csv")
 
         with tf.gfile.Open(dev_dir, "r") as f:
             reader = csv.reader(f, dialect='excel')
@@ -396,6 +402,73 @@ class KsaProcessor(DataProcessor):
     def get_labels(self):
         """See base class."""
         return ["0", "1", "2", "3", "4"]
+
+class KsaProcessor_4(DataProcessor):
+    """Processor for the fine-grained emotion analysis (Korean) data set (modified by Junha Hyung)."""
+
+    def get_train_examples(self, data_dir, _type=None):
+        """See base class."""
+        train_dir = os.path.join(data_dir, "final_train_without_neutral.csv")
+
+        with tf.gfile.Open(train_dir, "r") as f:
+            reader = csv.reader(f, dialect='excel')
+            lines = []
+            for line in reader:
+                lines.append(line)
+        examples = []
+        for (i, line) in enumerate(lines):
+            if i == 0:
+                continue
+            guid = "train-%d" % (i)
+            try:
+                text_a = tokenization.convert_to_unicode(line[1])
+            except:
+                print("{}, {}".format(i, line))
+            label = tokenization.convert_to_unicode(line[2])
+            examples.append(InputExample(guid=guid, text_a=text_a, text_b=None, label=label))
+        return examples
+
+    def get_dev_examples(self, data_dir, _type=None):
+        """See base class."""
+        dev_dir = os.path.join(data_dir, "final_test_without_neutral.csv")
+
+        with tf.gfile.Open(dev_dir, "r") as f:
+            reader = csv.reader(f, dialect='excel')
+            lines = []
+            for line in reader:
+                lines.append(line)
+        examples = []
+        for (i, line) in enumerate(lines):
+            if i == 0:
+                continue
+            guid = "dev-%d" % (i)
+            text_a = tokenization.convert_to_unicode(line[1])
+            label = tokenization.convert_to_unicode(line[2])
+            examples.append(InputExample(guid=guid, text_a=text_a, text_b=None, label=label))
+        return examples
+
+    def get_test_examples(self, data_dir):
+        """See base class."""
+        test_dir = os.path.join(data_dir, "korean_test.csv")
+        with tf.gfile.Open(test_dir, "r") as f:
+            reader = csv.reader(f, dialect='excel')
+            lines = []
+            for line in reader:
+                lines.append(line)
+        examples = []
+        for (i, line) in enumerate(lines):
+            if i == 0:
+                continue
+            guid = "test-%d" % (i)
+            text_a = tokenization.convert_to_unicode(line[2])
+            label = tokenization.convert_to_unicode(line[1])
+            examples.append(InputExample(guid=guid, text_a=text_a, text_b=None, label=label))
+        return examples
+
+    def get_labels(self):
+        """See base class."""
+        return ["1", "2", "3", "4"]
+
 
 class EmoProcessor(DataProcessor):
   """Processor for the fine-grained emotion analysis (Korean) data set (modified by Junha Hyung)."""
@@ -841,6 +914,14 @@ def model_fn_builder(bert_config, num_labels, init_checkpoint, learning_rate,
         precision = [0] * n
         update_op_rec = [[]] * n
         update_op_pre = [[]] *n
+
+        conf = [0] * n
+        for i in range(n):
+            conf[i] = [0] * n
+
+        update_op_conf = [0] * n
+        for i in range(n):
+            update_op_conf[i] = [0] * n
         
         for k in range(n):
             recall[k], update_op_rec[k] = tf.metrics.recall(
@@ -851,20 +932,85 @@ def model_fn_builder(bert_config, num_labels, init_checkpoint, learning_rate,
                 labels=tf.equal(label_ids, k),
                 predictions=tf.equal(predictions, k)
             )
-        return {
-            "eval_accuracy": accuracy,
-            "eval_loss": loss,
-            "neutral_recall": (recall[0], update_op_rec[0]),
-            "happy_recall": (recall[1], update_op_rec[1]),
-            "sad_recall": (recall[2], update_op_rec[2]),
-            "anger_recall": (recall[3], update_op_rec[3]),
-            "surprised_recall": (recall[4], update_op_rec[4]),
-            "neutral_precision": (precision[0], update_op_pre[0]),
-            "happy_precision": (precision[1], update_op_pre[1]),
-            "sad_precision": (precision[2], update_op_pre[2]),
-            "anger_precision": (precision[3], update_op_pre[3]),
-            "surprised_precision": (precision[4], update_op_pre[4])
-        }
+
+            conf_labels = tf.equal(label_ids, k)
+            for c in range(n):
+                conf[k][c], update_op_conf[k][c] = tf.metrics.true_positives(
+                    labels=conf_labels,
+                    predictions=tf.equal(predictions, c)
+                )
+
+        if n==5:
+            return {
+                "eval_accuracy": accuracy,
+                "eval_loss": loss,
+                "neutral_recall": (recall[0], update_op_rec[0]),
+                "happy_recall": (recall[1], update_op_rec[1]),
+                "sad_recall": (recall[2], update_op_rec[2]),
+                "anger_recall": (recall[3], update_op_rec[3]),
+                "surprised_recall": (recall[4], update_op_rec[4]),
+                "neutral_precision": (precision[0], update_op_pre[0]),
+                "happy_precision": (precision[1], update_op_pre[1]),
+                "sad_precision": (precision[2], update_op_pre[2]),
+                "anger_precision": (precision[3], update_op_pre[3]),
+                "surprised_precision": (precision[4], update_op_pre[4]),
+                "[0][0]": (conf[0][0], update_op_conf[0][0]),
+                "[0][1]": (conf[0][1], update_op_conf[0][1]),
+                "[0][2]": (conf[0][2], update_op_conf[0][2]),
+                "[0][3]": (conf[0][3], update_op_conf[0][3]),
+                "[0][4]": (conf[0][4], update_op_conf[0][4]),
+                "[1][0]": (conf[1][0], update_op_conf[1][0]),
+                "[1][1]": (conf[1][1], update_op_conf[1][1]),
+                "[1][2]": (conf[1][2], update_op_conf[1][2]),
+                "[1][3]": (conf[1][3], update_op_conf[1][3]),
+                "[1][4]": (conf[1][4], update_op_conf[1][4]),
+                "[2][0]": (conf[2][0], update_op_conf[2][0]),
+                "[2][1]": (conf[2][1], update_op_conf[2][1]),
+                "[2][2]": (conf[2][2], update_op_conf[2][2]),
+                "[2][3]": (conf[2][3], update_op_conf[2][3]),
+                "[2][4]": (conf[2][4], update_op_conf[2][4]),
+                "[3][0]": (conf[3][0], update_op_conf[3][0]),
+                "[3][1]": (conf[3][1], update_op_conf[3][1]),
+                "[3][2]": (conf[3][2], update_op_conf[3][2]),
+                "[3][3]": (conf[3][3], update_op_conf[3][3]),
+                "[3][4]": (conf[3][4], update_op_conf[3][4]),
+                "[4][0]": (conf[4][0], update_op_conf[4][0]),
+                "[4][1]": (conf[4][1], update_op_conf[4][1]),
+                "[4][2]": (conf[4][2], update_op_conf[4][2]),
+                "[4][3]": (conf[4][3], update_op_conf[4][3]),
+                "[4][4]": (conf[4][4], update_op_conf[4][4])
+            }
+
+        elif n==4:
+            return {
+                "eval_accuracy": accuracy,
+                "eval_loss": loss,
+                "happy_recall": (recall[0], update_op_rec[0]),
+                "sad_recall": (recall[1], update_op_rec[1]),
+                "anger_recall": (recall[2], update_op_rec[2]),
+                "surprised_recall": (recall[3], update_op_rec[3]),
+                "happy_precision": (precision[0], update_op_pre[0]),
+                "sad_precision": (precision[1], update_op_pre[1]),
+                "anger_precision": (precision[2], update_op_pre[2]),
+                "surprised_precision": (precision[3], update_op_pre[3]),
+                "[0][0]": (conf[0][0], update_op_conf[0][0]),
+                "[0][1]": (conf[0][1], update_op_conf[0][1]),
+                "[0][2]": (conf[0][2], update_op_conf[0][2]),
+                "[0][3]": (conf[0][3], update_op_conf[0][3]),
+                "[1][0]": (conf[1][0], update_op_conf[1][0]),
+                "[1][1]": (conf[1][1], update_op_conf[1][1]),
+                "[1][2]": (conf[1][2], update_op_conf[1][2]),
+                "[1][3]": (conf[1][3], update_op_conf[1][3]),
+                "[2][0]": (conf[2][0], update_op_conf[2][0]),
+                "[2][1]": (conf[2][1], update_op_conf[2][1]),
+                "[2][2]": (conf[2][2], update_op_conf[2][2]),
+                "[2][3]": (conf[2][3], update_op_conf[2][3]),
+                "[3][0]": (conf[3][0], update_op_conf[3][0]),
+                "[3][1]": (conf[3][1], update_op_conf[3][1]),
+                "[3][2]": (conf[3][2], update_op_conf[3][2]),
+                "[3][3]": (conf[3][3], update_op_conf[3][3]),
+            }
+
 
       eval_metrics = (metric_fn,
                       [per_example_loss, label_ids, logits, is_real_example])

@@ -1,0 +1,48 @@
+<!doctype html>
+<html>
+
+<head>
+<link href="https://fonts.googleapis.com/css?family=Do+Hyeon|Jua&display=swap" rel="stylesheet">
+<style type="text/css">
+h1{color: red; font-family:'Jua', sans-serif;}
+table{width: 600px; height: 200px;}
+button{height:40px; width:80px; margin:20px;}
+</style>
+</head>
+
+<body>
+	{% for result in results %}
+	<h1 align="center"> TEXT: {{result.Text}} </h1>
+
+	<table border=1 border align=center>
+		<tr align=center bgcolor="pink">
+			<th scope="row">EMOTION</th>
+			<td>PERCENTAGE (%)</td>
+		</tr>
+		<tr align=center>
+			<th scope="row">HAPPY</th>
+			<td> {{result.happy}} </td>
+		</tr>
+		<tr align=center>
+			<th scope="row">SAD</th>
+			<td> {{result.sad}} </td>
+		</tr>
+		<tr align=center>
+			<th scope="row">ANGER</th>
+			<td> {{result.angry}} </td>
+		</tr>
+		<tr align=center>
+			<th scope="row">SURPRISE</th>
+			<td> {{result.surprised}} </td>
+		</tr>
+	</table>
+
+	{% endfor %}		
+
+	<div align="center">
+	<button onclick="history.back()">Back</button>
+	</div>
+
+</body>
+
+</html>
