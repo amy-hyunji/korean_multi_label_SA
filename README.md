@@ -48,30 +48,30 @@ classify labels by Bag_Of_Words and linear SVM
 4. Recall : [0.67571429, 0.68714286, 0.73571429, 0.72142857]
 ### Adapter-Bert
 1. VERSION1 with 5 emotions - EPOCH 3
-**F1 score**
-neutral_f1: 0.60294
-anger_f1: 0.76289
-happy_f1: 0.66069
-sad_f1:  0.64336
-surprised_f1: 0.60115
-**confusion matrix**
-neutral     [410 27 82 67 113]
-happy       [38 518 57 52 35]
-sad         [90 28 479 60 43]
-angry       [45 39 69 460 84]
-surprise    [78 46 63 94 419]
+**F1 score**\
+neutral_f1: 0.60294\
+anger_f1: 0.76289\
+happy_f1: 0.66069\
+sad_f1:  0.64336\
+surprised_f1: 0.60115\
+**confusion matrix**\
+neutral     [410 27 82 67 113]\
+happy       [38 518 57 52 35]\
+sad         [90 28 479 60 43]\
+angry       [45 39 69 460 84]\
+surprise    [78 46 63 94 419]\
 
 2. VERSION2 with 4 emotions (without NEUTRAL) - EPOCH 100
-**F1 score**
-anger_f1: 0.9957020192282109
-happy_f1: 0.9949892770012569
-sad_f1: 0.9964413213714165
-surprised_f1: 0.9957203867503861
-**confusion matrix**
-happy       [695, 3, 0, 2]
-sad         [0, 700, 0, 0]
-angry       [2, 1, 695, 2]
-surprise    [0, 1, 1, 698]
+**F1 score**\
+anger_f1: 0.9957020192282109\
+happy_f1: 0.9949892770012569\
+sad_f1: 0.9964413213714165\
+surprised_f1: 0.9957203867503861\
+**confusion matrix**\
+happy       [695, 3, 0, 2]\
+sad         [0, 700, 0, 0]\
+angry       [2, 1, 695, 2]\
+surprise    [0, 1, 1, 698]\
 
 
 TODO
