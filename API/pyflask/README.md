@@ -8,7 +8,7 @@
 - path in result function : should have chromedriver to use crawling
 
 ## COMMAND
-./app.py
+python3 app.py
 
 ## HOW TO ACCESS
 localhost:5000
