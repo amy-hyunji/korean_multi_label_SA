@@ -38,9 +38,9 @@ BUCKET = "mbertfinetune"
 BERT_MODEL = 'multi_cased_L-12_H-768_A-12'
 BERT_MODEL_HUB = 'https://tfhub.dev/google/bert_'+BERT_MODEL+'/1'
 
-CKPT_DIR = "../../../checkpoints/multi_single_naver/bert-adapter-tfhub_models_korean_sa_model.ckpt-3104"
-OUTPUT_DIR= "../../../checkpoints/multi_single_naver"
-CONFIG_DIR = "../../../checkpoints/bert/bert_config.json"
+CKPT_DIR = "../checkpoints/4_checkpoint/bert-adapter-tfhub_models_korean_sa_4_model.ckpt-219918"
+OUTPUT_DIR= "../checkpoints/4_checkpoint"
+CONFIG_DIR = "../checkpoints/bert/bert_config.json"
 
 @app.route("/")
 def index():
@@ -52,7 +52,7 @@ def result():
         result = request.form.to_dict()
         
         search_sentence = result['Text']
-        path = "../../../chromedriver"
+        path = "../driver/chromedriver"
         chrome_options = webdriver.ChromeOptions()
         chrome_options.add_argument('headless')	
 
@@ -81,7 +81,7 @@ def result():
         result.update(emotion)
         results = [result]
         
-        return render_template("emotion.html", results=results)
+        return render_template("4_emotion.html", results=results)
 
 def get_run_config():
     return tf.contrib.tpu.RunConfig(
@@ -114,9 +114,8 @@ def classify(search_sentence):
         probabilities = prediction["probabilities"]
         if i>= 1: break
         
-        emotion = {"neutral":0, "happy":0, "sad": 0, "angry": 0, "surprised": 0}
-        _emotion = ["neutral", "happy", "sad", "angry", "surprised"]
-
+        emotion = {"happy": 0, "sad": 0, "angry": 0, "surprised": 0}
+        _emotion = ["happy", "sad", "angry", "surprised"]
         for (i, class_probability) in enumerate(probabilities): 
            emotion[_emotion[i]] = class_probability	
            print(_emotion[i] + ": " + str(class_probability))
@@ -124,14 +123,13 @@ def classify(search_sentence):
     return emotion
 
 def initsetting():
-    print("DOING INITIALSETTING!!!!!!!!!!!!!!!!!!!!!!!!!!!")
     tokenizer = run_classifier_with_tfhub.create_tokenizer_from_hub_module(BERT_MODEL_HUB)
 
     processors = {
         "cola": run_classifier.ColaProcessor,
         "mnli": run_classifier.MnliProcessor,
         "mrpc": run_classifier.MrpcProcessor,
-        "korean_sa": run_classifier.KsaProcessor,
+		  "korean_sa": run_classifier.KsaProcessor_4,
     }	
     processor = processors[TASK.lower()]()
     label_list = processor.get_labels()
