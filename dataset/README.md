@@ -1,44 +1,41 @@
 # final_dataset
 - naver movie rating + single turn + multi turn
+- [ALL] final_remove_dup.csv
+- [train] final_remove_dup_train.csv
+- [test] final_remove_dup_test.csv
 
 ## train
-- total data #: 33110
-- neutral #: 6622
-- happy #: 6622
-- sad #: 6622
-- anger #: 6622
-- suprised #: 6622
+- total data #: 50416
+- neutral #: 9905
+- happy #: 10294
+- sad #: 10477
+- anger #: 9418
+- suprised #: 10322
 
 ## test
-- total data #: 3500
-- neutral #: 700
-- happy #: 700
-- sad #: 700
-- anger #: 700
-- suprised #: 700
-
-## with_paraphrase
-- append back-translated sentence to train dataset
-- total data #: 66211
-- neutral #: 13243
-- happy #: 13242
-- sad #: 13244
-- anger #: 13241
-- surprised #: 13241
+- total data #: 12607
+- neutral #: 2477
+- happy #: 2574
+- sad #: 2620
+- anger #: 2355
+- suprised #: 2581
 
 # dataset without neutral
 - datasets without neutral. numbers for label NOT same
+- [ALL] final_remove_dup_no_neutral.csv
+- [train] final_remove_dup_no_neutral_train.csv
+- [test] final_remove_dup_no_neutral_test.csv
 
 ## train
-- total data #: 70374
-- happy #: 14197
-- sad #: 13944
-- anger #: 24821
-- surprised #: 17412
+- total data #: 40511
+- happy #: 10294
+- sad #: 10477
+- anger #: 9418
+- surprised #: 10322
 
 ## test
-- total data #: 2800
-- happy #: 700
-- sad #: 700
-- anger #: 700
-- surprised #: 700
+- total data #: 10130
+- happy #: 2574
+- sad #: 2620
+- anger #: 2355
+- surprised #: 2581
