@@ -42,10 +42,11 @@ classify labels by Bag_Of_Words and linear SVM
 ## Result
 ### BOG_final.ipynb
 - score with "without_neutral_train/test"
-1. Accuracy : 0.705
-2. F1 score : [0.73447205, 0.70321637, 0.69081154, 0.69511356]
-3. Precision :  [0.80442177, 0.72005988, 0.65107459, 0.67065073]
-4. Recall : [0.67571429, 0.68714286, 0.73571429, 0.72142857]
+- takes about 4.5 hrs
+1. Accuracy : 0.6057255676209279
+2. F1 score : [0.65456652, 0.61592795, 0.55240913, 0.59325651]
+3. Precision :  [0.65242494, 0.56458401, 0.6188447 , 0.5963106 ]
+4. Recall : [0.6567222 , 0.67754468, 0.49885496, 0.59023355]
 ### Adapter-Bert
 1. VERSION1 with 5 emotions 
 - EPOCH 3\
