@@ -66,15 +66,15 @@ surprise    [78 46 63 94 419]
 2. VERSION2 with 4 emotions (without NEUTRAL)
 - EPOCH 100\
 **[F1 score]**\
-anger_f1: 0.9957020192282109\
-happy_f1: 0.9949892770012569\
-sad_f1: 0.9964413213714165\
-surprised_f1: 0.9957203867503861\
+anger_f1: 0.6947900775643995\
+happy_f1: 0.7604186858082728\
+sad_f1: 0.7242876108892842\
+surprised_f1: 0.666947331666022\
 **[confusion matrix]**\
-happy       [695, 3, 0, 2]\
-sad         [0, 700, 0, 0]\
-angry       [2, 1, 695, 2]\
-surprise    [0, 1, 1, 698]
+happy       [1925, 221, 196, 238]\
+sad         [178, 1919, 243, 234]\
+angry       [195, 298, 1787, 339]\
+surprise    [185, 287, 299, 1584]
 
 
 TODO
