@@ -49,19 +49,19 @@ classify labels by Bag_Of_Words and linear SVM
 4. Recall : [0.6567222 , 0.67754468, 0.49885496, 0.59023355]
 ### Adapter-Bert
 1. VERSION1 with 5 emotions 
-- EPOCH 3\
+- EPOCH 100\
 **[F1 score]**\
-neutral_f1: 0.60294\
-anger_f1: 0.76289\
-happy_f1: 0.66069\
-sad_f1:  0.64336\
-surprised_f1: 0.60115\
+neutral_f1: 0.5630667728\
+anger_f1: 0.6504744126186982\
+happy_f1: 0.7279096898020445\
+sad_f1: 0.6457521731320633\
+surprised_f1: 0.5861065060317258\
 **[confusion matrix]**\
-neutral     [410 27 82 67 113]\
-happy       [38 518 57 52 35]\
-sad         [90 28 479 60 43]\
-angry       [45 39 69 460 84]\
-surprise    [78 46 63 94 419]
+neutral     [1366 187 305 260 358]\
+happy       [189 1870 158 185 178]\
+sad         [303 157 1657 241 216]\
+angry       [210 150 249 1714 294]\
+surprise    [308 194 189 253 1409]
 
 2. VERSION2 with 4 emotions (without NEUTRAL)
 - EPOCH 100\
@@ -75,7 +75,3 @@ happy       [1925, 221, 196, 238]\
 sad         [178, 1919, 243, 234]\
 angry       [195, 298, 1787, 339]\
 surprise    [185, 287, 299, 1584]
-
-
-TODO
-adapter없는 애랑도 비교해서 돌려보기
