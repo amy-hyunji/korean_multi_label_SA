@@ -10,11 +10,12 @@
 
 - REMOVE neutral FROM final_remove_dup_before_cleansing.csv
 	- final_before_cleansing_no_neutral.csv
-	- 48309
+	- 47965 
 
 - labelNUM
-	- neutral 49437
-	- happy 7167
-	- sad 7290
-	- angry 18200
-	- fear 5570
+	- neutral 45983 
+	- happy 7040
+	- sad 7083
+	- angry 17887
+	- surprised 10408
+	- fear 5547
