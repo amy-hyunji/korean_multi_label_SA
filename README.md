@@ -1,4 +1,20 @@
-# BERT + adapter for Korean SA finetuning
+# Research on Parameter efficient learning w/ multilingual korean sentiment analysis
+## KoBERT (or +adapter or +PAL) [2분기]
+multi labeled korean sentiment analysis
+- 4 labels: happy, sad, angry, surprised
+- KoBERT model
+- Google adapter for better transfer learning [https://arxiv.org/pdf/1902.00751.pdf]
+- PAL (Projected Attention Layers) [https://arxiv.org/pdf/1902.02671.pdf]
+
+## How to train
+### nsmc dataset
+python kobert_adapter/train-nsmc-*.py
+
+### 4way korean sentiment dataset
+python kobert_adapter/train-4way-*.py
+
+
+# BERT + adapter for Korean SA finetuning [1분기]
 multi labeled korean sentiment analysis
 - 5 labels: neutral, happy, sad, angry, surprised
 - multilingual BERT model
