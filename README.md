@@ -8,10 +8,10 @@ multi labeled korean sentiment analysis
 
 ## How to train
 ### nsmc dataset
-python kobert_adapter/train-nsmc-*.py
+`python kobert_adapter/train-nsmc-*.py`
 
 ### 4way korean sentiment dataset
-python kobert_adapter/train-4way-*.py
+`python kobert_adapter/train-4way-*.py`
 
 ## onnx
 
