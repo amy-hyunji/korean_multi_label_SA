@@ -1,5 +1,5 @@
-# Research on Parameter efficient learning w/ multilingual korean sentiment analysis
-## KoBERT (or +adapter or +PAL) [2분기]
+# Research on Parameter efficient learning w/ multilingual korean sentiment analysis [2분기]
+## KoBERT (or +adapter or +PAL)
 multi labeled korean sentiment analysis
 - 4 labels: happy, sad, angry, surprised
 - KoBERT model
@@ -12,6 +12,9 @@ python kobert_adapter/train-nsmc-*.py
 
 ### 4way korean sentiment dataset
 python kobert_adapter/train-4way-*.py
+
+## onnx
+
 
 
 # BERT + adapter for Korean SA finetuning [1분기]
