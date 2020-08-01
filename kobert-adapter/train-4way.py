@@ -4,7 +4,7 @@ import os
 from torch import nn
 from load_dataset import *
 from Models import BertClassifier
-from KoBERT.kobert.pytorch_kobert_adapter import get_pytorch_kobert_model_adapter
+from KoBERT.kobert.pytorch_kobert import get_pytorch_kobert_model
 from transformers import AdamW
 #from transformers.optimization import WarmupLinearSchedule
 from transformers.optimization import get_linear_schedule_with_warmup
@@ -13,7 +13,14 @@ from tensorboardX import SummaryWriter
 TENSORBOARD_DIR = "./tensorboard"
 if not os.path.exists(TENSORBOARD_DIR):
     os.mkdir(TENSORBOARD_DIR)
-writer = SummaryWriter(TENSORBOARD_DIR)
+task = "4way"
+writerDIR = os.path.join(TENSORBOARD_DIR, task)
+if not os.path.exists(writerDIR):
+    os.mkdir(writerDIR)
+writer = SummaryWriter(writerDIR)
+
+if not os.path.exists("./ckpt/{}".format(task)): 
+    os.makedirs("./ckpt/{}".format(task))
 
 def calc_accuracy(X,Y):
     max_vals, max_indices = torch.max(X, 1)
@@ -37,18 +44,19 @@ def save_checkpoint(model, save_pth):
 ## Setting parameters
 batch_size = 64
 warmup_ratio = 0.1
-num_epochs = 500
+num_epochs = 250
 max_grad_norm = 1
 log_interval = 200
 learning_rate =  5e-5
 dr_rate = 0.5
 
-device = torch.device("cuda:0")
+device = torch.device("cuda:1")
+torch.cuda.set_device(device)
 
-bertmodel, vocab  = get_pytorch_kobert_model_adapter()
+bertmodel, vocab  = get_pytorch_kobert_model()
 model = BertClassifier.BERTClassifier4way(bertmodel, dr_rate=dr_rate).to(device)
 
-prepare_train_adapter(model)
+#prepare_train_adapter(model)
 
 no_decay = ['bias', 'LayerNorm.weight']
 optimizer_grouped_parameters = [
@@ -72,6 +80,11 @@ scheduler = get_linear_schedule_with_warmup(optimizer, num_warmup_steps=warmup_s
 
 #sequence_output, pooled_output = model(input_ids, input_mask, token_type_ids)
 #pooled_output.shape
+
+print("num of trainable parameters")
+model_parameters = filter(lambda p: p.requires_grad, model.parameters())
+params = sum([np.prod(p.size()) for p in model_parameters])
+print(params)
 
 
 for e in range(num_epochs):
@@ -126,7 +139,7 @@ for e in range(num_epochs):
     if (e%50 == 0):
         model_name = "{}_ckpt.pth".format(e)
         print("saving the model.. {}".format(model_name))
-        save_checkpoint(model, "./ckpt/{}".format(model_name))
+        save_checkpoint(model, "./ckpt/{}/{}".format(task, model_name))
 
 
     model.eval()

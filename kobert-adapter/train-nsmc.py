@@ -1,22 +1,49 @@
 import tqdm
 import torch
+import os
 from torch import nn
 from load_dataset import *
 from Models import BertClassifier
-from kobert.pytorch_kobert import get_pytorch_kobert_model
+from KoBERT.kobert.pytorch_kobert import get_pytorch_kobert_model
 from transformers import AdamW
-from transformers.optimization import WarmupLinearSchedule
+#from transformers.optimization import WarmupLinearSchedule
+from transformers.optimization import get_linear_schedule_with_warmup
+from tensorboardX import SummaryWriter
+
+TENSORBOARD_DIR = "./tensorboard"
+if not os.path.exists(TENSORBOARD_DIR):
+    os.mkdir(TENSORBOARD_DIR)
+task = "nsmc"
+writerDIR = os.path.join(TENSORBOARD_DIR, task)
+if not os.path.exists(writerDIR):
+    os.mkdir(writerDIR)
+writer = SummaryWriter(writerDIR)
+
+if not os.path.exists("./ckpt/{}".format(task)):
+    os.makedirs("./ckpt/{}".format(task))
+
+def calc_accuracy(X,Y):
+    max_vals, max_indices = torch.max(X, 1)
+    train_acc = (max_indices == Y).sum().data.cpu().numpy()/max_indices.size()[0]
+    return train_acc
+
+def save_checkpoint(model, save_pth):
+    if not os.path.exists(os.path.dirname(save_pth)):
+        os.makedirs(os.path.dirname(save_pth))
+    torch.save(model.cpu().state_dict(), save_pth)
+    model.cuda()
 
 ## Setting parameters
 batch_size = 64
 warmup_ratio = 0.1
-num_epochs = 500
+num_epochs = 200
 max_grad_norm = 1
 log_interval = 200
 learning_rate =  5e-5
 dr_rate = 0.5
 
-device = torch.device("cuda:2")
+device = torch.device("cuda:1")
+torch.cuda.set_device(device)
 
 bertmodel, vocab  = get_pytorch_kobert_model()
 model = BertClassifier.BERTClassifier(bertmodel, dr_rate=dr_rate).to(device)
@@ -30,22 +57,20 @@ optimizer = AdamW(optimizer_grouped_parameters, lr=learning_rate)
 loss_fn = nn.CrossEntropyLoss()
 
 train_d = load_nsmc_train(vocab)
-print(train_d[0])
+print("finished loading nsmc")
+# print(train_d[0])
 
 test_d = load_nsmc_test(vocab)
-print(test_d)
+# print(test_d)
 
 t_total = len(train_d) * num_epochs
 warmup_step = int(t_total * warmup_ratio)
-scheduler = WarmupLinearSchedule(optimizer, warmup_steps=warmup_step, t_total=t_total)
+#scheduler = WarmupLinearSchedule(optimizer, warmup_steps=warmup_step, t_total=t_total)
+scheduler = get_linear_schedule_with_warmup(optimizer, num_warmup_steps=warmup_step, num_training_steps=t_total)
 
 #sequence_output, pooled_output = model(input_ids, input_mask, token_type_ids)
 #pooled_output.shape
 
-def calc_accuracy(X,Y):
-    max_vals, max_indices = torch.max(X, 1)
-    train_acc = (max_indices == Y).sum().data.cpu().numpy()/max_indices.size()[0]
-    return train_acc
 
 for e in range(num_epochs):
     train_acc = 0.0
@@ -68,6 +93,7 @@ for e in range(num_epochs):
             label = batch[el][1]
             labels.append(label)
 
+        # print("token_ids: {}, valid_length: {}, segment_ids: {}".format(token_ids.shape, valid_length.shape, segment_ids.shape))
         token_ids = torch.LongTensor(token_ids)
         valid_length = torch.LongTensor(valid_length)
         segment_ids = torch.LongTensor(segment_ids)
@@ -81,14 +107,25 @@ for e in range(num_epochs):
 
         out = model(token_ids, valid_length, segment_ids)
         loss = loss_fn(out, labels)
+        #loss.requires_grad = True
         loss.backward()
         torch.nn.utils.clip_grad_norm_(model.parameters(), max_grad_norm)
         optimizer.step()
         scheduler.step()  # Update learning rate schedule
         train_acc += calc_accuracy(out, labels)
         if batch_id % log_interval == 0:
-            print("epoch {} batch id {} loss {} train acc {}".format(e+1, batch_id+1, loss.data.cpu().numpy(), train_acc / (batch_id+1)))
-    print("epoch {} train acc {}".format(e+1, train_acc / (batch_id+1)))
+            print("epoch {} batch id {} loss {} train acc {}".format(e, batch_id+1, loss.data.cpu().numpy(), train_acc / (batch_id+1)))
+        # tensorboard
+        writer.add_scalar("train/loss", loss, batch_id + steps*e)
+    print("epoch {} train acc {}".format(e, train_acc / (batch_id+1)))
+    writer.add_scalar("train/accuracy", train_acc/(batch_id+1), e)
+
+    # save model
+    if (e%50 == 0):
+        model_name = "{}_ckpt.pth".format(e)
+        print("saving the model.. {}".format(model_name))
+        save_checkpoint(model, "./ckpt/{}".format(model_name))
+
 
     model.eval()
     steps = len(test_d) // batch_size
@@ -112,4 +149,7 @@ for e in range(num_epochs):
 
         out = model(token_ids, valid_length, segment_ids)
         test_acc += calc_accuracy(out, labels)
-    print("epoch {} test acc {}".format(e+1, test_acc / (batch_id+1)))
+    print("epoch {} test acc {}".format(e, test_acc / (batch_id+1)))
+    writer.add_scalar("test/accuracy", test_acc/(batch_id+1), e)
+    writer.close()
+    print("done writing")

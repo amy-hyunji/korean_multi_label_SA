@@ -4,7 +4,7 @@ import os
 from torch import nn
 from load_dataset import *
 from Models import BertClassifier
-from KoBERT.kobert.pytorch_kobert_adapter import get_pytorch_kobert_model_adapter
+from KoBERT.kobert.pytorch_kobert import get_pytorch_kobert_model
 from transformers import AdamW
 #from transformers.optimization import WarmupLinearSchedule
 from transformers.optimization import get_linear_schedule_with_warmup
@@ -13,13 +13,13 @@ from tensorboardX import SummaryWriter
 TENSORBOARD_DIR = "./tensorboard"
 if not os.path.exists(TENSORBOARD_DIR):
     os.mkdir(TENSORBOARD_DIR)
-task = "nsmcAdapter128"
+task = "4way-partial"
 writerDIR = os.path.join(TENSORBOARD_DIR, task)
 if not os.path.exists(writerDIR):
     os.mkdir(writerDIR)
 writer = SummaryWriter(writerDIR)
 
-if not os.path.exists("./ckpt/{}".format(task)):
+if not os.path.exists("./ckpt/{}".format(task)): 
     os.makedirs("./ckpt/{}".format(task))
 
 def calc_accuracy(X,Y):
@@ -27,13 +27,14 @@ def calc_accuracy(X,Y):
     train_acc = (max_indices == Y).sum().data.cpu().numpy()/max_indices.size()[0]
     return train_acc
 
-def prepare_train_adapter(model):
+def prepare_train_partial(model):
     model.train()
     for name, param in model.named_parameters():
-        if 'adapter' in name:
+        if 'layer.11.output' in name:
             param.requires_grad = True
         else:
             param.requires_grad = False
+
 
 def save_checkpoint(model, save_pth):
     if not os.path.exists(os.path.dirname(save_pth)):
@@ -44,19 +45,22 @@ def save_checkpoint(model, save_pth):
 ## Setting parameters
 batch_size = 64
 warmup_ratio = 0.1
-num_epochs = 200
+num_epochs = 250
 max_grad_norm = 1
 log_interval = 200
 learning_rate =  5e-5
 dr_rate = 0.5
 
-device = torch.device("cuda:2")
+device = torch.device("cuda:3")
 torch.cuda.set_device(device)
 
-bertmodel, vocab  = get_pytorch_kobert_model_adapter()
-model = BertClassifier.BERTClassifier(bertmodel, dr_rate=dr_rate).to(device)
+bertmodel, vocab  = get_pytorch_kobert_model()
+model = BertClassifier.BERTClassifier4way(bertmodel, dr_rate=dr_rate).to(device)
 
-prepare_train_adapter(model)
+for name, param in model.named_parameters():
+    print(name)
+
+prepare_train_partial(model)
 
 no_decay = ['bias', 'LayerNorm.weight']
 optimizer_grouped_parameters = [
@@ -66,11 +70,11 @@ optimizer_grouped_parameters = [
 optimizer = AdamW(optimizer_grouped_parameters, lr=learning_rate)
 loss_fn = nn.CrossEntropyLoss()
 
-train_d = load_nsmc_train(vocab)
-print("finished loading nsmc")
+train_d = load_4way_train(vocab)
+print("finished loading 4way")
 # print(train_d[0])
 
-test_d = load_nsmc_test(vocab)
+test_d = load_4way_test(vocab)
 # print(test_d)
 
 t_total = len(train_d) * num_epochs
@@ -80,6 +84,11 @@ scheduler = get_linear_schedule_with_warmup(optimizer, num_warmup_steps=warmup_s
 
 #sequence_output, pooled_output = model(input_ids, input_mask, token_type_ids)
 #pooled_output.shape
+
+print("num of trainable parameters")
+model_parameters = filter(lambda p: p.requires_grad, model.parameters())
+params = sum([np.prod(p.size()) for p in model_parameters])
+print(params)
 
 
 for e in range(num_epochs):

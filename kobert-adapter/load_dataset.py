@@ -3,7 +3,7 @@ import torch
 import numpy as np
 import gluonnlp as nlp
 
-from kobert.utils import get_tokenizer
+from KoBERT.kobert.utils import get_tokenizer
 
 max_len = 64
 pad = True
@@ -48,11 +48,14 @@ def load_nsmc_test(vocab):
             if idx == 0:
                 continue
             newrow = []
-            sentence = row[1]
-            label = row[2]
-            newrow.append(transform([sentence]))
-            newrow.append(np.int32(label))
-            test.append(newrow)
+            try:
+                sentence = row[1]
+                label = row[2]
+                newrow.append(transform([sentence]))
+                newrow.append(np.int32(label))
+                test.append(newrow)
+            except:
+                continue
 
     return test
 
